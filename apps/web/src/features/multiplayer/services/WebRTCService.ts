@@ -1,5 +1,8 @@
 import { Device } from 'mediasoup-client';
-import type { Transport, Producer, Consumer, RtpCapabilities } from 'mediasoup-client/lib/types';
+type Transport = any;
+type Producer = any;
+type Consumer = any;
+type RtpCapabilities = any;
 import { socketService } from './SocketService';
 
 class WebRTCService {
@@ -18,12 +21,12 @@ class WebRTCService {
     if (!this.device) throw new Error('Device not loaded');
     this.sendTransport = this.device.createSendTransport(transportParams);
 
-    this.sendTransport.on('connect', ({ dtlsParameters }, callback) => {
+    this.sendTransport.on('connect', ({ dtlsParameters }: any, callback: any) => {
       socketService.emit('connectTransport', { transportId: this.sendTransport!.id, dtlsParameters });
       socketService.on('transportConnected', callback);
     });
 
-    this.sendTransport.on('produce', ({ kind, rtpParameters }, callback) => {
+    this.sendTransport.on('produce', ({ kind, rtpParameters }: any, callback: any) => {
       socketService.emit('produce', { transportId: this.sendTransport!.id, kind, rtpParameters });
       socketService.on('produced', ({ id }: { id: string }) => callback({ id }));
     });
@@ -35,7 +38,7 @@ class WebRTCService {
     if (!this.device) throw new Error('Device not loaded');
     this.recvTransport = this.device.createRecvTransport(transportParams);
 
-    this.recvTransport.on('connect', ({ dtlsParameters }, callback) => {
+    this.recvTransport.on('connect', ({ dtlsParameters }: any, callback: any) => {
       socketService.emit('connectTransport', { transportId: this.recvTransport!.id, dtlsParameters });
       socketService.on('transportConnected', callback);
     });

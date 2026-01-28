@@ -11,11 +11,11 @@ export async function roomRoutes(app: FastifyInstance) {
 
   app.get<{ Params: { id: string } }>("/api/rooms/:id", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await roomService.getById((req.params as any).id)) });
 
-  app.post<{ Params: { id: string } }>("/api/rooms/:id/start", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.startRoom(req.user\!.userId, (req.params as any).id)) });
+  app.post<{ Params: { id: string } }>("/api/rooms/:id/start", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.startRoom(req.user!.userId, (req.params as any).id)) });
 
-  app.get("/api/rooms/progress", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await roomService.getAllUserProgress(req.user\!.userId)) });
+  app.get("/api/rooms/progress", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await roomService.getAllUserProgress(req.user!.userId)) });
 
-  app.post<{ Params: { id: string } }>("/api/rooms/:id/activate-puzzle", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.activatePuzzle(req.user\!.userId, (req.params as any).id)) });
+  app.post<{ Params: { id: string } }>("/api/rooms/:id/activate-puzzle", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.activatePuzzle(req.user!.userId, (req.params as any).id)) });
 
-  app.post<{ Params: { id: string } }>("/api/rooms/:id/debrief", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.moveToDebrief(req.user\!.userId, (req.params as any).id)) });
+  app.post<{ Params: { id: string } }>("/api/rooms/:id/debrief", { preHandler: [authenticate], handler: async (req, rep) => rep.send(await gameEngine.moveToDebrief(req.user!.userId, (req.params as any).id)) });
 }

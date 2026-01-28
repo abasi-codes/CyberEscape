@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/store/store';
-import { setTeam, addMember, removeMember, setMemberReady, setStatus } from '@/store/slices/teamSlice';
+import { setTeam, addMember, removeMember, setMemberReady } from '@/store/slices/teamSlice';
 import { useSocket } from '@/hooks/useSocket';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Card, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Copy, Check, Users, Crown } from 'lucide-react';
@@ -21,7 +20,6 @@ export default function TeamLobby() {
   const auth = useSelector((s: RootState) => s.auth);
   const { emit, on } = useSocket();
   const [copied, setCopied] = useState(false);
-  const [joinCode, setJoinCode] = useState('');
 
   useEffect(() => {
     if (id) {

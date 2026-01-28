@@ -14,14 +14,14 @@ export function setupWebSocket(httpServer: HttpServer): SocketServer {
   const io = new SocketServer(httpServer, { cors: { origin: config.cors.origin, methods: ["GET", "POST"] }, path: "/ws" });
 
   try {
-    const pub = new Redis({ host: config.redis.host, port: config.redis.port, password: config.redis.password, lazyConnect: true });
+    const pub = new (Redis as any)({ host: config.redis.host, port: config.redis.port, password: config.redis.password, lazyConnect: true });
     const sub = pub.duplicate();
     Promise.all([pub.connect(), sub.connect()]).then(() => { io.adapter(createAdapter(pub, sub)); logger.info("Socket.IO Redis adapter connected"); }).catch((e) => logger.warn({ e }, "Redis adapter unavailable"));
   } catch { logger.warn("Redis adapter setup skipped"); }
 
   io.use((socket, next) => {
     const token = socket.handshake.auth.token || socket.handshake.headers.authorization?.replace("Bearer ", "");
-    if (\!token) return next(new Error("Authentication required"));
+    if (!token) return next(new Error("Authentication required"));
     try { (socket as any).user = jwt.verify(token, config.jwt.secret) as JwtPayload; next(); }
     catch { next(new Error("Invalid token")); }
   });

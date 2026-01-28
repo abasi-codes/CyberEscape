@@ -8,14 +8,14 @@ const prisma = new PrismaClient();
 export class IntegrationService {
   async listWebhooks(orgId: string) { return prisma.webhookConfig.findMany({ where: { organizationId: orgId } }); }
   async createWebhook(orgId: string, data: any) { return prisma.webhookConfig.create({ data: { organizationId: orgId, ...data } }); }
-  async updateWebhook(id: string, data: any) { const w = await prisma.webhookConfig.findUnique({ where: { id } }); if (\!w) throw notFound("Not found"); return prisma.webhookConfig.update({ where: { id }, data }); }
+  async updateWebhook(id: string, data: any) { const w = await prisma.webhookConfig.findUnique({ where: { id } }); if (!w) throw notFound("Not found"); return prisma.webhookConfig.update({ where: { id }, data }); }
   async deleteWebhook(id: string) { await prisma.webhookConfig.delete({ where: { id } }); return { success: true }; }
 
   async dispatchWebhook(orgId: string, event: string, payload: any) {
     const whs = await prisma.webhookConfig.findMany({ where: { organizationId: orgId, isActive: true } });
     for (const wh of whs) {
       const evts = wh.events as string[];
-      if (\!evts.includes(event) && \!evts.includes("*")) continue;
+      if (!evts.includes(event) && !evts.includes("*")) continue;
       const body = JSON.stringify({ event, timestamp: new Date().toISOString(), data: payload });
       const sig = crypto.createHmac("sha256", wh.secret).update(body).digest("hex");
       try { await fetch(wh.url, { method: "POST", headers: { "Content-Type": "application/json", "X-Webhook-Signature": sig }, body }); await prisma.webhookConfig.update({ where: { id: wh.id }, data: { lastTriggeredAt: new Date() } }); }

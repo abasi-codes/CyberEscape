@@ -11,7 +11,7 @@ const ROLE_HIERARCHY: Record<string, number> = {
 export function requireRole(...allowedRoles: string[]) {
   return async function (request: FastifyRequest, _reply: FastifyReply): Promise<void> {
     const user = request.user;
-    if (\!user) {
+    if (!user) {
       throw forbidden("No authenticated user");
     }
     const userLevel = ROLE_HIERARCHY[user.role] ?? 0;

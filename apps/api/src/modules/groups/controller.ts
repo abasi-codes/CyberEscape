@@ -11,12 +11,12 @@ const groupService = new GroupService();
 export async function groupRoutes(app: FastifyInstance) {
   app.post<{ Body: CreateGroupInput }>("/api/groups", {
     preHandler: [authenticate, requireRole("ORG_ADMIN", "MANAGER"), validateBody(createGroupSchema)],
-    handler: async (req, rep) => rep.status(201).send(await groupService.create(req.user\!.organizationId, req.body)),
+    handler: async (req, rep) => rep.status(201).send(await groupService.create(req.user!.organizationId, req.body)),
   });
 
   app.get("/api/groups", {
     preHandler: [authenticate, requireRole("ORG_ADMIN", "MANAGER")],
-    handler: async (req, rep) => rep.send(await groupService.list(req.user\!.organizationId)),
+    handler: async (req, rep) => rep.send(await groupService.list(req.user!.organizationId)),
   });
 
   app.get<{ Params: { id: string } }>("/api/groups/:id", {

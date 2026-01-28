@@ -37,11 +37,11 @@ export class AuthService {
 
   async login(input: LoginInput) {
     const user = await prisma.user.findUnique({ where: { email: input.email } });
-    if (\!user || \!user.passwordHash) throw unauthorized("Invalid email or password");
-    if (user.status \!== "ACTIVE") throw unauthorized("Account is not active");
+    if (!user || !user.passwordHash) throw unauthorized("Invalid email or password");
+    if (user.status !== "ACTIVE") throw unauthorized("Account is not active");
 
     const valid = await bcrypt.compare(input.password, user.passwordHash);
-    if (\!valid) throw unauthorized("Invalid email or password");
+    if (!valid) throw unauthorized("Invalid email or password");
 
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
 
@@ -57,12 +57,12 @@ export class AuthService {
 
   async refresh(refreshToken: string) {
     const stored = await prisma.refreshToken.findUnique({ where: { token: refreshToken } });
-    if (\!stored || stored.revokedAt || stored.expiresAt < new Date()) {
+    if (!stored || stored.revokedAt || stored.expiresAt < new Date()) {
       throw unauthorized("Invalid or expired refresh token");
     }
 
     const user = await prisma.user.findUnique({ where: { id: stored.userId } });
-    if (\!user) throw notFound("User not found");
+    if (!user) throw notFound("User not found");
 
     await prisma.refreshToken.update({ where: { id: stored.id }, data: { revokedAt: new Date() } });
 
@@ -88,24 +88,24 @@ export class AuthService {
       }),
     });
 
-    if (\!tokenRes.ok) throw badRequest("Failed to exchange Google auth code");
+    if (!tokenRes.ok) throw badRequest("Failed to exchange Google auth code");
     const tokenData = await tokenRes.json() as { access_token: string };
 
     const profileRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
 
-    if (\!profileRes.ok) throw badRequest("Failed to get Google profile");
+    if (!profileRes.ok) throw badRequest("Failed to get Google profile");
     const profile = await profileRes.json() as { id: string; email: string; given_name: string; family_name: string; picture: string };
 
     let user = await prisma.user.findUnique({ where: { googleId: profile.id } });
-    if (\!user) {
+    if (!user) {
       user = await prisma.user.findUnique({ where: { email: profile.email } });
       if (user) {
         user = await prisma.user.update({ where: { id: user.id }, data: { googleId: profile.id, avatar: profile.picture } });
       } else {
         const defaultOrg = await prisma.organization.findFirst();
-        if (\!defaultOrg) throw badRequest("No organization available for sign-up");
+        if (!defaultOrg) throw badRequest("No organization available for sign-up");
         user = await prisma.user.create({
           data: {
             email: profile.email, firstName: profile.given_name || "User", lastName: profile.family_name || "",

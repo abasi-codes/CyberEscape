@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Mail, AlertTriangle, CheckCircle, ExternalLink } from 'lucide-react';
+import { Mail, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface Email {
   id: string;

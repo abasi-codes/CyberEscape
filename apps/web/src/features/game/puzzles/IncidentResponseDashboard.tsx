@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardTitle, CardContent } from '@/components/ui/Card';
-import { AlertTriangle, Shield, Clock, FileText } from 'lucide-react';
+import { AlertTriangle, Shield, Clock } from 'lucide-react';
 
 interface Alert {
   id: string;

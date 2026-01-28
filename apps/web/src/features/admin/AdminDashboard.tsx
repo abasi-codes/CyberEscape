@@ -4,8 +4,8 @@ import type { RootState, AppDispatch } from '@/store/store';
 import { fetchOrgStats, fetchAlerts } from '@/store/slices/adminSlice';
 import { Card, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Users, CheckCircle, TrendingUp, Megaphone, AlertTriangle, Shield } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Users, CheckCircle, TrendingUp, Shield } from 'lucide-react';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>();

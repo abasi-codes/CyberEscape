@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
 import { Shield, Wifi, Server, Monitor } from 'lucide-react';
 
 interface NetworkNode {
@@ -30,7 +29,7 @@ const iconMap = { firewall: Shield, router: Wifi, server: Server, workstation: M
 
 export default function NetworkMazePuzzle({ content, onSubmit }: Props) {
   const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
-  const [firewallRules, setFirewallRules] = useState<Record<string, string>>({});
+  const [firewallRules, _setFirewallRules] = useState<Record<string, string>>({});
   const nodes = content.nodes || [];
   const tasks = content.tasks || [];
 

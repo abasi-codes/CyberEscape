@@ -5,7 +5,7 @@ import { evaluateBadges } from "./badge-evaluator.js";
 import { notFound } from "../../utils/errors.js";
 
 const prisma = new PrismaClient();
-const redis = new Redis({ host: config.redis.host, port: config.redis.port, password: config.redis.password, lazyConnect: true });
+const redis = new (Redis as any)({ host: config.redis.host, port: config.redis.port, password: config.redis.password, lazyConnect: true });
 
 export class GamificationService {
   async awardPoints(userId: string, points: number) {
@@ -34,13 +34,13 @@ export class GamificationService {
 
   async getUserProgress(userId: string) {
     const [stats, badges, progress] = await Promise.all([prisma.userStats.findUnique({ where: { userId } }), prisma.userBadge.count({ where: { userId } }), prisma.gameProgress.findMany({ where: { userId }, include: { room: { select: { id: true, name: true, slug: true } } } })]);
-    if (\!stats) throw notFound("User stats not found");
+    if (!stats) throw notFound("User stats not found");
     return { stats, badgeCount: badges, roomProgress: progress };
   }
 
   async updateStreak(userId: string) {
     const stats = await prisma.userStats.findUnique({ where: { userId } });
-    if (\!stats) return;
+    if (!stats) return;
     const now = new Date();
     let newStreak = 1;
     if (stats.lastPlayedAt) { const diffH = (now.getTime() - stats.lastPlayedAt.getTime()) / 3600000; if (diffH < 48) newStreak = stats.currentStreak + 1; }
@@ -50,7 +50,7 @@ export class GamificationService {
 
   async getStreaks(userId: string) {
     const stats = await prisma.userStats.findUnique({ where: { userId } });
-    if (\!stats) throw notFound("User stats not found");
+    if (!stats) throw notFound("User stats not found");
     return { currentStreak: stats.currentStreak, longestStreak: stats.longestStreak, lastPlayedAt: stats.lastPlayedAt };
   }
 }

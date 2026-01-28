@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 import { Card, CardTitle, CardContent } from '@/components/ui/Card';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { api } from '@/lib/api';
 
 const COLORS = ['#00d4ff', '#00ff88', '#ffaa00', '#ff3355', '#8b5cf6', '#06b6d4'];

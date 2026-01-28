@@ -29,10 +29,10 @@ export interface GameState {
 export class GameEngine {
   async startRoom(userId: string, roomId: string): Promise<GameState> {
     const room = await prisma.room.findUnique({ where: { id: roomId }, include: { puzzles: { where: { isActive: true }, orderBy: { order: "asc" } } } });
-    if (\!room) throw notFound("Room not found");
+    if (!room) throw notFound("Room not found");
 
     let progress = await prisma.gameProgress.findUnique({ where: { userId_roomId: { userId, roomId } } });
-    if (\!progress) {
+    if (!progress) {
       progress = await prisma.gameProgress.create({ data: { userId, roomId, status: "LOADING", startedAt: new Date() } });
     } else {
       progress = await prisma.gameProgress.update({ where: { id: progress.id }, data: { status: "LOADING", startedAt: new Date(), score: 0, timeSpent: 0, currentPuzzle: 0, hintsUsed: 0 } });
@@ -46,7 +46,7 @@ export class GameEngine {
   async activatePuzzle(userId: string, roomId: string): Promise<GameState> {
     const progress = await this.getProgress(userId, roomId);
     const room = await prisma.room.findUnique({ where: { id: roomId }, include: { puzzles: { where: { isActive: true }, orderBy: { order: "asc" } } } });
-    if (\!room) throw notFound("Room not found");
+    if (!room) throw notFound("Room not found");
 
     if (progress.currentPuzzle >= room.puzzles.length) {
       await prisma.gameProgress.update({ where: { id: progress.id }, data: { status: "ROOM_COMPLETE", completedAt: new Date() } });
@@ -61,10 +61,10 @@ export class GameEngine {
 
   async submitAnswer(userId: string, roomId: string, puzzleId: string, answer: unknown): Promise<{ state: GameState; result: ValidationResult; score: number }> {
     const progress = await this.getProgress(userId, roomId);
-    if (progress.status \!== "PUZZLE_ACTIVE") throw badRequest("No active puzzle");
+    if (progress.status !== "PUZZLE_ACTIVE") throw badRequest("No active puzzle");
 
     const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId } });
-    if (\!puzzle) throw notFound("Puzzle not found");
+    if (!puzzle) throw notFound("Puzzle not found");
 
     const previousAttempts = await prisma.puzzleAttempt.count({ where: { userId, puzzleId } });
     const result = validateAnswer(puzzle.type, answer, puzzle.answer as any, puzzle.config);
@@ -93,7 +93,7 @@ export class GameEngine {
   async requestHint(userId: string, roomId: string, puzzleId: string): Promise<{ hint: string | null; cost: number }> {
     const progress = await this.getProgress(userId, roomId);
     const puzzle = await prisma.puzzle.findUnique({ where: { id: puzzleId } });
-    if (\!puzzle) throw notFound("Puzzle not found");
+    if (!puzzle) throw notFound("Puzzle not found");
 
     const hints = puzzle.hints as string[];
     const previousAttempts = await prisma.puzzleAttempt.count({ where: { userId, puzzleId } });
@@ -101,7 +101,7 @@ export class GameEngine {
 
     const hintConfig: HintConfig = { hints, hintsUsed: progress.hintsUsed, timeSpent, timeLimit: puzzle.timeLimit, attempts: previousAttempts };
     const nextHint = getNextHint(hintConfig);
-    if (\!nextHint) return { hint: null, cost: 0 };
+    if (!nextHint) return { hint: null, cost: 0 };
 
     await prisma.gameProgress.update({ where: { id: progress.id }, data: { hintsUsed: progress.hintsUsed + 1 } });
     const cost = Math.round(puzzle.basePoints * 0.15 * (nextHint.index + 1));
@@ -111,7 +111,7 @@ export class GameEngine {
   async getState(userId: string, roomId: string): Promise<GameState> {
     const progress = await this.getProgress(userId, roomId);
     const room = await prisma.room.findUnique({ where: { id: roomId }, include: { puzzles: { where: { isActive: true }, orderBy: { order: "asc" } } } });
-    if (\!room) throw notFound("Room not found");
+    if (!room) throw notFound("Room not found");
 
     const state: GameState = { userId, roomId, status: progress.status as GameStatus, score: progress.score, timeSpent: progress.timeSpent, currentPuzzle: progress.currentPuzzle, totalPuzzles: room.puzzles.length, hintsUsed: progress.hintsUsed };
 
@@ -139,7 +139,7 @@ export class GameEngine {
 
   private async getProgress(userId: string, roomId: string) {
     const progress = await prisma.gameProgress.findUnique({ where: { userId_roomId: { userId, roomId } } });
-    if (\!progress) throw notFound("No game progress found. Start the room first.");
+    if (!progress) throw notFound("No game progress found. Start the room first.");
     return progress;
   }
 }

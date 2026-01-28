@@ -6,7 +6,6 @@ import { fetchUsers } from '@/store/slices/adminSlice';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { Upload, Search, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 export default function UserManagement() {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
-  const { users, totalUsers, loading } = useSelector((s: RootState) => s.admin);
+  const { users, totalUsers } = useSelector((s: RootState) => s.admin);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 

@@ -10,13 +10,13 @@ export class RoomService {
 
   async getById(id: string) {
     const room = await prisma.room.findUnique({ where: { id }, include: { puzzles: { where: { isActive: true }, orderBy: { order: "asc" }, select: { id: true, title: true, description: true, type: true, order: true, basePoints: true, timeLimit: true } } } });
-    if (\!room) throw notFound("Room not found");
+    if (!room) throw notFound("Room not found");
     return room;
   }
 
   async getBySlug(slug: string) {
     const room = await prisma.room.findUnique({ where: { slug }, include: { puzzles: { where: { isActive: true }, orderBy: { order: "asc" }, select: { id: true, title: true, description: true, type: true, order: true, basePoints: true, timeLimit: true } } } });
-    if (\!room) throw notFound("Room not found");
+    if (!room) throw notFound("Room not found");
     return room;
   }
 

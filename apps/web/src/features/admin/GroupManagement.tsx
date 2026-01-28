@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Card, CardTitle, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/Dialog';
 import { FolderTree, Plus, Users, Edit, Trash2 } from 'lucide-react';
 import { api } from '@/lib/api';

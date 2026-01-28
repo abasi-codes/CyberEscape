@@ -12,7 +12,7 @@ export async function userRoutes(app: FastifyInstance) {
   app.get<{ Querystring: ListUsersInput }>("/api/users", {
     preHandler: [authenticate, requireRole("ORG_ADMIN", "MANAGER"), validateQuery(listUsersSchema)],
     handler: async (request, reply) => {
-      const result = await userService.list(request.user\!.organizationId, request.query as ListUsersInput);
+      const result = await userService.list(request.user!.organizationId, request.query as ListUsersInput);
       return reply.send(result);
     },
   });
@@ -20,7 +20,7 @@ export async function userRoutes(app: FastifyInstance) {
   app.get("/api/users/me", {
     preHandler: [authenticate],
     handler: async (request, reply) => {
-      const result = await userService.getProfile(request.user\!.userId);
+      const result = await userService.getProfile(request.user!.userId);
       return reply.send(result);
     },
   });
@@ -53,9 +53,9 @@ export async function userRoutes(app: FastifyInstance) {
     preHandler: [authenticate, requireRole("ORG_ADMIN")],
     handler: async (request, reply) => {
       const data = await request.file();
-      if (\!data) return reply.status(400).send({ error: "No file uploaded" });
+      if (!data) return reply.status(400).send({ error: "No file uploaded" });
       const csvContent = (await data.toBuffer()).toString("utf-8");
-      const result = await userService.importCsv(request.user\!.organizationId, csvContent);
+      const result = await userService.importCsv(request.user!.organizationId, csvContent);
       return reply.send(result);
     },
   });

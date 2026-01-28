@@ -11,7 +11,7 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <I18nextProvider i18n={i18n}>
+      <I18nextProvider i18n={i18n as any}>
         <BrowserRouter>
           <App />
         </BrowserRouter>

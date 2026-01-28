@@ -39,7 +39,7 @@ export class RoomManager {
 
   async createRoom(roomId: string): Promise<Room> {
     if (this.rooms.has(roomId)) {
-      return this.rooms.get(roomId)\!;
+      return this.rooms.get(roomId)!;
     }
 
     const worker = this.workers[this.nextWorkerIdx];
@@ -72,7 +72,7 @@ export class RoomManager {
 
   async addPeer(roomId: string, peerId: string, socket: Socket): Promise<void> {
     let room = this.rooms.get(roomId);
-    if (\!room) {
+    if (!room) {
       room = await this.createRoom(roomId);
     }
 
@@ -89,10 +89,10 @@ export class RoomManager {
 
   removePeer(roomId: string, peerId: string): void {
     const room = this.rooms.get(roomId);
-    if (\!room) return;
+    if (!room) return;
 
     const peer = room.peers.get(peerId);
-    if (\!peer) return;
+    if (!peer) return;
 
     for (const consumer of peer.consumers.values()) {
       consumer.close();
@@ -123,10 +123,10 @@ export class RoomManager {
     dtlsParameters: unknown;
   }> {
     const room = this.rooms.get(roomId);
-    if (\!room) throw new Error("Room not found: " + roomId);
+    if (!room) throw new Error("Room not found: " + roomId);
 
     const peer = room.peers.get(peerId);
-    if (\!peer) throw new Error("Peer not found: " + peerId);
+    if (!peer) throw new Error("Peer not found: " + peerId);
 
     const transport = await room.router.createWebRtcTransport(
       config.webRtcTransportOptions
@@ -175,13 +175,13 @@ export class RoomManager {
     dtlsParameters: DtlsParameters
   ): Promise<void> {
     const room = this.rooms.get(roomId);
-    if (\!room) throw new Error("Room not found: " + roomId);
+    if (!room) throw new Error("Room not found: " + roomId);
 
     const peer = room.peers.get(peerId);
-    if (\!peer) throw new Error("Peer not found: " + peerId);
+    if (!peer) throw new Error("Peer not found: " + peerId);
 
     const transport = peer.transports.get(transportId);
-    if (\!transport) throw new Error("Transport not found: " + transportId);
+    if (!transport) throw new Error("Transport not found: " + transportId);
 
     await transport.connect({ dtlsParameters });
     logger.info({ roomId, peerId, transportId }, "Transport connected");
@@ -195,13 +195,13 @@ export class RoomManager {
     rtpParameters: RtpParameters
   ): Promise<string> {
     const room = this.rooms.get(roomId);
-    if (\!room) throw new Error("Room not found: " + roomId);
+    if (!room) throw new Error("Room not found: " + roomId);
 
     const peer = room.peers.get(peerId);
-    if (\!peer) throw new Error("Peer not found: " + peerId);
+    if (!peer) throw new Error("Peer not found: " + peerId);
 
     const transport = peer.transports.get(transportId);
-    if (\!transport) throw new Error("Transport not found: " + transportId);
+    if (!transport) throw new Error("Transport not found: " + transportId);
 
     const producer = await transport.produce({ kind, rtpParameters });
 
@@ -233,12 +233,12 @@ export class RoomManager {
     rtpParameters: RtpParameters;
   }> {
     const room = this.rooms.get(roomId);
-    if (\!room) throw new Error("Room not found: " + roomId);
+    if (!room) throw new Error("Room not found: " + roomId);
 
     const peer = room.peers.get(peerId);
-    if (\!peer) throw new Error("Peer not found: " + peerId);
+    if (!peer) throw new Error("Peer not found: " + peerId);
 
-    if (\!room.router.canConsume({ producerId, rtpCapabilities })) {
+    if (!room.router.canConsume({ producerId, rtpCapabilities })) {
       throw new Error("Cannot consume producer: " + producerId);
     }
 
@@ -247,12 +247,12 @@ export class RoomManager {
     );
 
     let transport: WebRtcTransport | undefined = recvTransport;
-    if (\!transport) {
+    if (!transport) {
       transport = Array.from(peer.transports.values())[
         peer.transports.size - 1
       ];
     }
-    if (\!transport) throw new Error("No recv transport found for peer: " + peerId);
+    if (!transport) throw new Error("No recv transport found for peer: " + peerId);
 
     const consumer = await transport.consume({
       producerId,
@@ -294,13 +294,13 @@ export class RoomManager {
     consumerId: string
   ): Promise<void> {
     const room = this.rooms.get(roomId);
-    if (\!room) throw new Error("Room not found: " + roomId);
+    if (!room) throw new Error("Room not found: " + roomId);
 
     const peer = room.peers.get(peerId);
-    if (\!peer) throw new Error("Peer not found: " + peerId);
+    if (!peer) throw new Error("Peer not found: " + peerId);
 
     const consumer = peer.consumers.get(consumerId);
-    if (\!consumer) throw new Error("Consumer not found: " + consumerId);
+    if (!consumer) throw new Error("Consumer not found: " + consumerId);
 
     await consumer.resume();
     logger.info({ roomId, peerId, consumerId }, "Consumer resumed");
@@ -308,13 +308,13 @@ export class RoomManager {
 
   closeProducer(roomId: string, peerId: string, producerId: string): void {
     const room = this.rooms.get(roomId);
-    if (\!room) return;
+    if (!room) return;
 
     const peer = room.peers.get(peerId);
-    if (\!peer) return;
+    if (!peer) return;
 
     const producer = peer.producers.get(producerId);
-    if (\!producer) return;
+    if (!producer) return;
 
     producer.close();
     peer.producers.delete(producerId);
@@ -326,7 +326,7 @@ export class RoomManager {
     excludePeerId: string
   ): Array<{ peerId: string; producerId: string; kind: MediaKind }> {
     const room = this.rooms.get(roomId);
-    if (\!room) return [];
+    if (!room) return [];
 
     const producers: Array<{
       peerId: string;
@@ -350,7 +350,7 @@ export class RoomManager {
 
   closeRoom(roomId: string): void {
     const room = this.rooms.get(roomId);
-    if (\!room) return;
+    if (!room) return;
 
     for (const [peerId] of room.peers) {
       this.removePeer(roomId, peerId);
@@ -363,11 +363,11 @@ export class RoomManager {
 
   getOtherPeerSockets(roomId: string, excludePeerId: string): Socket[] {
     const room = this.rooms.get(roomId);
-    if (\!room) return [];
+    if (!room) return [];
 
     const sockets: Socket[] = [];
     for (const [peerId, peer] of room.peers) {
-      if (peerId \!== excludePeerId) {
+      if (peerId !== excludePeerId) {
         sockets.push(peer.socket);
       }
     }

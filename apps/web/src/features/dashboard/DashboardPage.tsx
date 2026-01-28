@@ -5,7 +5,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Progress } from '@/components/ui/Progress';
 import { Lock, CheckCircle, Play, Flame, Star, Trophy } from 'lucide-react';
 import { api } from '@/lib/api';
 import { formatPoints } from '@/lib/utils';

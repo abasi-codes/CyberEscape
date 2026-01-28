@@ -45,19 +45,19 @@ export class UserService {
         userBadges: { include: { badge: true }, orderBy: { awardedAt: "desc" }, take: 10 },
       },
     });
-    if (\!user) throw notFound("User not found");
+    if (!user) throw notFound("User not found");
     return user;
   }
 
   async update(id: string, data: UpdateUserInput) {
     const user = await prisma.user.findUnique({ where: { id } });
-    if (\!user) throw notFound("User not found");
+    if (!user) throw notFound("User not found");
     return prisma.user.update({ where: { id }, data, select: { id: true, email: true, firstName: true, lastName: true, role: true, status: true, avatar: true, locale: true } });
   }
 
   async delete(id: string) {
     const user = await prisma.user.findUnique({ where: { id } });
-    if (\!user) throw notFound("User not found");
+    if (!user) throw notFound("User not found");
     await prisma.user.delete({ where: { id } });
     return { success: true };
   }
@@ -69,10 +69,10 @@ export class UserService {
     for (const record of records) {
       try {
         const { email, firstName, lastName, role, password } = record as any;
-        if (\!email || \!firstName || \!lastName) { results.errors.push(`Missing fields for: ${email || "unknown"}`); results.skipped++; continue; }
+        if (!email || !firstName || !lastName) { results.errors.push(`Missing fields for: ${email || "unknown"}`); results.skipped++; continue; }
         const existing = await prisma.user.findUnique({ where: { email } });
         if (existing) { results.skipped++; continue; }
-        const passwordHash = await bcrypt.hash(password || "ChangeMe123\!", 12);
+        const passwordHash = await bcrypt.hash(password || "ChangeMe123!", 12);
         await prisma.user.create({ data: { email, firstName, lastName, passwordHash, role: role || "LEARNER", organizationId: orgId, stats: { create: {} } } });
         results.created++;
       } catch (e) { results.errors.push(`Error: ${(e as Error).message}`); results.skipped++; }

@@ -7,17 +7,17 @@ const prisma = new PrismaClient();
 export class AlertService {
   async list(orgId: string, acknowledged?: boolean) {
     const where: any = { organizationId: orgId };
-    if (acknowledged \!== undefined) where.isAcknowledged = acknowledged;
+    if (acknowledged !== undefined) where.isAcknowledged = acknowledged;
     return prisma.alert.findMany({ where, orderBy: { createdAt: "desc" }, take: 100 });
   }
 
   async create(orgId: string, data: CreateAlertInput) {
-    return prisma.alert.create({ data: { organizationId: orgId, title: data.title, message: data.message, severity: data.severity as AlertSeverity, metadata: data.metadata ?? {} } });
+    return prisma.alert.create({ data: { organizationId: orgId, title: data.title, message: data.message, severity: data.severity as AlertSeverity, metadata: (data.metadata ?? {}) as any } });
   }
 
   async acknowledge(id: string, userId: string) {
     const alert = await prisma.alert.findUnique({ where: { id } });
-    if (\!alert) throw notFound("Alert not found");
+    if (!alert) throw notFound("Alert not found");
     return prisma.alert.update({ where: { id }, data: { isAcknowledged: true, acknowledgedBy: userId, acknowledgedAt: new Date() } });
   }
 

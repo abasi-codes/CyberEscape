@@ -18,7 +18,7 @@ declare module "fastify" {
 
 export async function authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   const authHeader = request.headers.authorization;
-  if (\!authHeader?.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith("Bearer ")) {
     throw unauthorized("Missing or invalid authorization header");
   }
   const token = authHeader.slice(7);

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export class PuzzleService {
   async getById(id: string) {
     const puzzle = await prisma.puzzle.findUnique({ where: { id }, select: { id: true, title: true, description: true, type: true, order: true, basePoints: true, timeLimit: true, config: true, hints: true, explanation: true, roomId: true } });
-    if (\!puzzle) throw notFound("Puzzle not found");
+    if (!puzzle) throw notFound("Puzzle not found");
     return puzzle;
   }
 

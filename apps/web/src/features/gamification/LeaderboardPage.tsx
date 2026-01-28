@@ -17,7 +17,7 @@ const rankIcons = [
 
 export default function LeaderboardPage() {
   const dispatch = useDispatch<AppDispatch>();
-  const { leaderboard, leaderboardPeriod, loading } = useSelector((s: RootState) => s.gamification);
+  const { leaderboard, leaderboardPeriod } = useSelector((s: RootState) => s.gamification);
   const auth = useSelector((s: RootState) => s.auth);
 
   useEffect(() => {

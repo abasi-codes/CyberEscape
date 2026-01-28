@@ -43,7 +43,7 @@ export function buildWhereClause(filters: Record<string, unknown>): Record<strin
   const where: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(filters)) {
     if (value === undefined || value === null || value === "") continue;
-    if (typeof value === "string" && \!key.endsWith("Id") && key \!== "role" && key \!== "status") {
+    if (typeof value === "string" && !key.endsWith("Id") && key !== "role" && key !== "status") {
       where[key] = { contains: value, mode: "insensitive" };
     } else {
       where[key] = value;

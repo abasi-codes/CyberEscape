@@ -1,5 +1,3 @@
-const BASE_URL = '';
-
 interface RequestConfig {
   params?: Record<string, any>;
   headers?: Record<string, string>;

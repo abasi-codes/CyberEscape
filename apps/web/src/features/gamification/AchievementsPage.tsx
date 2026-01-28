@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { Trophy, Lock, Star } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Lock } from 'lucide-react';
 import { api } from '@/lib/api';
 import { motion } from 'framer-motion';
 

@@ -1,7 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Device } from 'mediasoup-client';
-import type { Transport, Producer, Consumer } from 'mediasoup-client/lib/types';
 import { useSocket } from './useSocket';
+
+type Transport = any;
+type Producer = any;
+type Consumer = any;
 
 interface Peer {
   id: string;
@@ -9,7 +12,7 @@ interface Peer {
 }
 
 export function useWebRTC(roomId: string | null) {
-  const { emit, on } = useSocket();
+  const { emit } = useSocket();
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [peers, setPeers] = useState<Peer[]>([]);
   const [audioEnabled, setAudioEnabled] = useState(true);
