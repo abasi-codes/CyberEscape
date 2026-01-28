@@ -227,7 +227,105 @@ async function main() {
     },
   ];
 
-  for (const p of [...room1Puzzles, ...room3Puzzles]) { await prisma.puzzle.create({ data: p }); }
+  const room2Puzzles = [
+    {
+      roomId: createdRooms["phishing-defense"],
+      title: "Inbox Threat Detection",
+      description: "Review emails and classify each as phishing or legitimate.",
+      type: PuzzleType.PHISHING_CLASSIFICATION,
+      order: 1,
+      basePoints: 150,
+      timeLimit: 300,
+      config: JSON.stringify({
+        emails: [
+          { id: "1", from: "security@yourcompany.com", subject: "Mandatory Password Reset", body: "Hi,\n\nAs part of our scheduled security update, please reset your password using the company portal at https://portal.yourcompany.com/reset.\n\nThanks,\nIT Security Team", isPhishing: false, indicators: [] },
+          { id: "2", from: "support@micros0ft.com", subject: "Unusual Sign-In Activity", body: "We detected unusual activity on your account. Click here immediately to verify your identity: http://micros0ft-verify.ru/login\n\nIf you don't act within 24 hours your account will be suspended.", isPhishing: true, indicators: ["Misspelled domain (micros0ft)", "Urgency pressure", "Suspicious URL (.ru domain)"] },
+          { id: "3", from: "hr@yourcompany.com", subject: "Updated Benefits Package", body: "Hello,\n\nPlease review the updated benefits package for 2026 attached to this email. Contact HR if you have questions.\n\nBest,\nHuman Resources", isPhishing: false, indicators: [] },
+          { id: "4", from: "ceo@yourcompany.net", subject: "Urgent Wire Transfer Needed", body: "I need you to process a wire transfer of $15,000 to the attached account immediately. This is confidential — do not discuss with anyone else.\n\nSent from my iPhone", isPhishing: true, indicators: ["Wrong domain (.net vs .com)", "Unusual request from CEO", "Secrecy demand", "Urgency pressure"] },
+        ],
+      }),
+      hints: JSON.stringify(["Check the sender's domain carefully", "Watch for urgency and threats", "Verify unusual requests through a separate channel"]),
+      answer: JSON.stringify({ correct: "phishing" }),
+      explanation: "Phishing emails often use misspelled domains, urgency, and unusual requests to trick victims.",
+    },
+    {
+      roomId: createdRooms["phishing-defense"],
+      title: "Phishing Red Flags",
+      description: "Identify which characteristics are common phishing indicators.",
+      type: PuzzleType.MULTIPLE_CHOICE,
+      order: 2,
+      basePoints: 100,
+      timeLimit: 120,
+      config: JSON.stringify({
+        question: "Which of the following is the STRONGEST indicator of a phishing email?",
+        options: [
+          { id: "0", text: "The email has a company logo" },
+          { id: "1", text: "The sender domain is misspelled" },
+          { id: "2", text: "The email was sent during business hours" },
+          { id: "3", text: "The email includes a greeting" },
+        ],
+      }),
+      hints: JSON.stringify(["Logos can be copied easily", "Focus on what is hard to fake"]),
+      answer: JSON.stringify({ correct: 1 }),
+      explanation: "A misspelled sender domain is a strong phishing indicator because attackers cannot send from the real domain.",
+    },
+    {
+      roomId: createdRooms["phishing-defense"],
+      title: "Social Engineering Tactics",
+      description: "Match social engineering techniques to their descriptions.",
+      type: PuzzleType.MATCHING,
+      order: 3,
+      basePoints: 120,
+      timeLimit: 180,
+      config: JSON.stringify({
+        leftItems: [
+          { id: "0", label: "Pretexting" },
+          { id: "1", label: "Baiting" },
+          { id: "2", label: "Tailgating" },
+          { id: "3", label: "Quid pro quo" },
+        ],
+        rightItems: [
+          { id: "0", label: "Creating a fabricated scenario" },
+          { id: "1", label: "Offering something enticing" },
+          { id: "2", label: "Following someone through a secure door" },
+          { id: "3", label: "Exchanging a service for information" },
+        ],
+      }),
+      hints: JSON.stringify(["Pretexting involves impersonation", "Baiting uses temptation"]),
+      answer: JSON.stringify({ pairs: [[0, 0], [1, 1], [2, 2], [3, 3]] }),
+      explanation: "Social engineering exploits human psychology rather than technical vulnerabilities.",
+    },
+    {
+      roomId: createdRooms["phishing-defense"],
+      title: "Phishing Response Steps",
+      description: "Order the correct steps when you suspect a phishing email.",
+      type: PuzzleType.SEQUENCE,
+      order: 4,
+      basePoints: 130,
+      timeLimit: 180,
+      config: JSON.stringify({
+        items: [
+          { id: "0", label: "Do not click any links" },
+          { id: "1", label: "Report to IT security" },
+          { id: "2", label: "Verify sender through separate channel" },
+          { id: "3", label: "Delete or quarantine the email" },
+          { id: "4", label: "Warn colleagues if widespread" },
+        ],
+        categories: [
+          { id: "step-1", label: "Step 1" },
+          { id: "step-2", label: "Step 2" },
+          { id: "step-3", label: "Step 3" },
+          { id: "step-4", label: "Step 4" },
+          { id: "step-5", label: "Step 5" },
+        ],
+      }),
+      hints: JSON.stringify(["First, avoid making it worse", "Report before deleting evidence"]),
+      answer: JSON.stringify({ order: [0, 2, 1, 3, 4] }),
+      explanation: "Don't click, verify, report, quarantine, then alert others.",
+    },
+  ];
+
+  for (const p of [...room1Puzzles, ...room2Puzzles, ...room3Puzzles]) { await prisma.puzzle.create({ data: p }); }
 
   const badges = [
     { name: "First Steps", description: "Complete your first puzzle", icon: "rocket", tier: BadgeTier.BRONZE, category: BadgeCategory.COMPLETION, criteria: JSON.stringify({ puzzlesSolved: 1 }), points: 10 },
