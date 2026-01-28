@@ -1,0 +1,490 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ORG_ADMIN
+  MANAGER
+  LEARNER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum RoomType {
+  PASSWORD_AUTH
+  PHISHING
+  DATA_PROTECTION
+  NETWORK_SECURITY
+  INSIDER_THREAT
+  INCIDENT_RESPONSE
+}
+
+enum PuzzleType {
+  MULTIPLE_CHOICE
+  PASSWORD_STRENGTH
+  PHISHING_CLASSIFICATION
+  DRAG_DROP
+  CODE_ENTRY
+  SEQUENCE
+  MATCHING
+  SIMULATION
+}
+
+enum GameStatus {
+  IDLE
+  LOADING
+  INTRO
+  PUZZLE_ACTIVE
+  PUZZLE_FEEDBACK
+  ROOM_COMPLETE
+  ROOM_FAILED
+  DEBRIEF
+}
+
+enum TeamStatus {
+  LOBBY
+  IN_GAME
+  COMPLETED
+  DISBANDED
+}
+
+enum BadgeTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum BadgeCategory {
+  COMPLETION
+  SPEED
+  ACCURACY
+  STREAK
+  SOCIAL
+  MASTERY
+  SPECIAL
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum ReportType {
+  ORGANIZATION
+  GROUP
+  USER
+  ROOM
+  COMPLIANCE
+}
+
+model Organization {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  logoUrl      String?
+  primaryColor String   @default("#6366f1")
+  domain       String?
+  maxUsers     Int      @default(100)
+  settings     Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  users        User[]
+  groups       Group[]
+  campaigns    Campaign[]
+  alerts       Alert[]
+  reports      Report[]
+  auditLogs    AuditLog[]
+  ssoConfigs   SSOConfig[]
+  webhookConfigs WebhookConfig[]
+  scormPackages  SCORMPackage[]
+
+  @@index([slug])
+}
+
+model User {
+  id             String     @id @default(cuid())
+  email          String     @unique
+  passwordHash   String?
+  firstName      String
+  lastName       String
+  role           UserRole   @default(LEARNER)
+  status         UserStatus @default(ACTIVE)
+  avatar         String?
+  locale         String     @default("en")
+  googleId       String?    @unique
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  lastLoginAt    DateTime?
+  userGroups     UserGroup[]
+  gameProgress   GameProgress[]
+  puzzleAttempts PuzzleAttempt[]
+  teamMembers    TeamMember[]
+  stats          UserStats?
+  userBadges     UserBadge[]
+  userDailyChallenges UserDailyChallenge[]
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+
+  @@index([email])
+  @@index([organizationId])
+  @@index([googleId])
+}
+
+model Group {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  userGroups     UserGroup[]
+
+  @@index([organizationId])
+}
+
+model UserGroup {
+  id         String   @id @default(cuid())
+  userId     String
+  groupId    String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group      Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@unique([userId, groupId])
+}
+
+model Room {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  type        RoomType
+  order       Int
+  timeLimit   Int      @default(1800)
+  difficulty  Int      @default(1)
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  puzzles     Puzzle[]
+  gameProgress GameProgress[]
+
+  @@index([slug])
+  @@index([order])
+}
+
+model Puzzle {
+  id          String     @id @default(cuid())
+  roomId      String
+  room        Room       @relation(fields: [roomId], references: [id])
+  title       String
+  description String
+  type        PuzzleType
+  order       Int
+  basePoints  Int        @default(100)
+  timeLimit   Int        @default(300)
+  config      Json       @default("{}")
+  hints       Json       @default("[]")
+  answer      Json
+  explanation String?
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  attempts    PuzzleAttempt[]
+
+  @@index([roomId, order])
+}
+
+model GameProgress {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  roomId        String
+  room          Room       @relation(fields: [roomId], references: [id])
+  status        GameStatus @default(IDLE)
+  score         Int        @default(0)
+  timeSpent     Int        @default(0)
+  currentPuzzle Int        @default(0)
+  hintsUsed     Int        @default(0)
+  startedAt     DateTime?
+  completedAt   DateTime?
+  metadata      Json       @default("{}")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([userId, roomId])
+  @@index([userId])
+  @@index([roomId])
+}
+
+model PuzzleAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  puzzleId  String
+  puzzle    Puzzle   @relation(fields: [puzzleId], references: [id])
+  answer    Json
+  isCorrect Boolean
+  score     Int      @default(0)
+  timeSpent Int      @default(0)
+  hintsUsed Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([userId, puzzleId])
+}
+
+model Team {
+  id        String     @id @default(cuid())
+  name      String
+  joinCode  String     @unique
+  status    TeamStatus @default(LOBBY)
+  maxSize   Int        @default(4)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  members   TeamMember[]
+  sessions  TeamSession[]
+
+  @@index([joinCode])
+}
+
+model TeamMember {
+  id       String   @id @default(cuid())
+  teamId   String
+  team     Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  role     String   @default("member")
+  isReady  Boolean  @default(false)
+  joinedAt DateTime @default(now())
+
+  @@unique([teamId, userId])
+}
+
+model TeamSession {
+  id          String   @id @default(cuid())
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id])
+  roomId      String
+  score       Int      @default(0)
+  timeSpent   Int      @default(0)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  metadata    Json     @default("{}")
+
+  @@index([teamId])
+}
+
+model UserStats {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  totalScore      Int       @default(0)
+  roomsCompleted  Int       @default(0)
+  puzzlesSolved   Int       @default(0)
+  totalTimePlayed Int       @default(0)
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  accuracy        Float     @default(0)
+  lastPlayedAt    DateTime?
+  updatedAt       DateTime  @updatedAt
+
+  @@index([totalScore])
+}
+
+model Badge {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String
+  icon        String
+  tier        BadgeTier
+  category    BadgeCategory
+  criteria    Json
+  points      Int           @default(0)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  userBadges  UserBadge[]
+
+  @@index([category])
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  awardedAt DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+model DailyChallenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  puzzleConfig Json
+  bonusPoints Int      @default(50)
+  activeDate  DateTime @unique
+  createdAt   DateTime @default(now())
+  userDailyChallenges UserDailyChallenge[]
+
+  @@index([activeDate])
+}
+
+model UserDailyChallenge {
+  id               String         @id @default(cuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  dailyChallengeId String
+  dailyChallenge   DailyChallenge @relation(fields: [dailyChallengeId], references: [id])
+  completed        Boolean        @default(false)
+  score            Int            @default(0)
+  completedAt      DateTime?
+
+  @@unique([userId, dailyChallengeId])
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  name           String
+  description    String?
+  organizationId String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  status         CampaignStatus @default(DRAFT)
+  startDate      DateTime?
+  endDate        DateTime?
+  targetRooms    Json           @default("[]")
+  targetGroups   Json           @default("[]")
+  settings       Json           @default("{}")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([organizationId])
+}
+
+model Alert {
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  title          String
+  message        String
+  severity       AlertSeverity
+  isAcknowledged Boolean       @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  metadata       Json          @default("{}")
+  createdAt      DateTime      @default(now())
+
+  @@index([organizationId, isAcknowledged])
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
+  action         String
+  resource       String
+  resourceId     String?
+  details        Json         @default("{}")
+  ipAddress      String?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([userId])
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  type           ReportType
+  title          String
+  data           Json
+  generatedAt    DateTime     @default(now())
+
+  @@index([organizationId, type])
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  @@index([token])
+  @@index([userId])
+}
+
+model SSOConfig {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  provider       String
+  clientId       String
+  clientSecret   String
+  domain         String?
+  isActive       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, provider])
+}
+
+model WebhookConfig {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  url             String
+  events          Json         @default("[]")
+  secret          String
+  isActive        Boolean      @default(true)
+  lastTriggeredAt DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([organizationId])
+}
+
+model SCORMPackage {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  version        String       @default("2004")
+  roomIds        Json         @default("[]")
+  packageUrl     String?
+  generatedAt    DateTime     @default(now())
+
+  @@index([organizationId])
+}

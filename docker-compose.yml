@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: cyber
+      POSTGRES_PASSWORD: cyber
+      POSTGRES_DB: cyberescape
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+
+  coturn:
+    image: coturn/coturn:latest
+    ports:
+      - '3478:3478'
+      - '3478:3478/udp'
+      - '10000-10100:10000-10100/udp'
+    command: >
+      -n
+      --log-file=stdout
+      --lt-cred-mech
+      --fingerprint
+      --realm=cyberescape
+      --user=cyber:cyber
+      --min-port=10000
+      --max-port=10100
+
+volumes:
+  pgdata:
+  redisdata:
