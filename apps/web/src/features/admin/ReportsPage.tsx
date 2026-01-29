@@ -13,14 +13,14 @@ export default function ReportsPage() {
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
-    api.get('/api/v1/admin/reports').then(r => setReports(r.data)).catch(() => {});
+    api.get('/api/admin/reports').then(r => setReports(r.data)).catch(() => {});
   }, []);
 
   const generate = async () => {
     setGenerating(true);
     try {
-      await api.post('/api/v1/admin/reports', { type: reportType, filters: {} });
-      api.get('/api/v1/admin/reports').then(r => setReports(r.data));
+      await api.post('/api/admin/reports', { type: reportType, filters: {} });
+      api.get('/api/admin/reports').then(r => setReports(r.data));
     } finally {
       setGenerating(false);
     }

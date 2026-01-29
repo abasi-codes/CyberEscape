@@ -9,7 +9,7 @@ import type { UpdateUserInput, ListUsersInput } from "./schema.js";
 const userService = new UserService();
 
 export async function userRoutes(app: FastifyInstance) {
-  app.get<{ Querystring: ListUsersInput }>("/api/users", {
+  app.get<{ Querystring: ListUsersInput }>("/api/v1/users", {
     preHandler: [authenticate, requireRole("ORG_ADMIN", "MANAGER"), validateQuery(listUsersSchema)],
     handler: async (request, reply) => {
       const result = await userService.list(request.user!.organizationId, request.query as ListUsersInput);
@@ -17,7 +17,7 @@ export async function userRoutes(app: FastifyInstance) {
     },
   });
 
-  app.get("/api/users/me", {
+  app.get("/api/v1/users/me", {
     preHandler: [authenticate],
     handler: async (request, reply) => {
       const result = await userService.getProfile(request.user!.userId);
@@ -25,7 +25,7 @@ export async function userRoutes(app: FastifyInstance) {
     },
   });
 
-  app.get<{ Params: { id: string } }>("/api/users/:id", {
+  app.get<{ Params: { id: string } }>("/api/v1/users/:id", {
     preHandler: [authenticate, requireRole("ORG_ADMIN", "MANAGER")],
     handler: async (request, reply) => {
       const result = await userService.getById((request.params as { id: string }).id);
@@ -33,7 +33,7 @@ export async function userRoutes(app: FastifyInstance) {
     },
   });
 
-  app.patch<{ Params: { id: string }; Body: UpdateUserInput }>("/api/users/:id", {
+  app.patch<{ Params: { id: string }; Body: UpdateUserInput }>("/api/v1/users/:id", {
     preHandler: [authenticate, requireRole("ORG_ADMIN"), validateBody(updateUserSchema)],
     handler: async (request, reply) => {
       const result = await userService.update((request.params as { id: string }).id, request.body);
@@ -41,7 +41,7 @@ export async function userRoutes(app: FastifyInstance) {
     },
   });
 
-  app.delete<{ Params: { id: string } }>("/api/users/:id", {
+  app.delete<{ Params: { id: string } }>("/api/v1/users/:id", {
     preHandler: [authenticate, requireRole("ORG_ADMIN")],
     handler: async (request, reply) => {
       const result = await userService.delete((request.params as { id: string }).id);
@@ -49,7 +49,7 @@ export async function userRoutes(app: FastifyInstance) {
     },
   });
 
-  app.post("/api/users/import", {
+  app.post("/api/v1/users/import", {
     preHandler: [authenticate, requireRole("ORG_ADMIN")],
     handler: async (request, reply) => {
       const data = await request.file();

@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '@/store/store';
 import {
-  startRoom, setIntro, startPuzzle, submitAnswer, showFeedback,
+  startRoom, setBriefing, setIntro, startPuzzle, submitAnswer, showFeedback,
   completePuzzle, revealHint, tickTimer, failRoom, completeRoom,
   goToDebrief, resetGame,
 } from '@/store/slices/gameSlice';
@@ -13,6 +13,7 @@ export function useGameState() {
   return {
     ...game,
     startRoom: (data: Parameters<typeof startRoom>[0]) => dispatch(startRoom(data)),
+    setBriefing: () => dispatch(setBriefing()),
     setIntro: () => dispatch(setIntro()),
     startPuzzle: (data: Parameters<typeof startPuzzle>[0]) => dispatch(startPuzzle(data)),
     submitAnswer: () => dispatch(submitAnswer()),

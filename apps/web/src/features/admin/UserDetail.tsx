@@ -12,7 +12,7 @@ export default function UserDetail() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    if (id) api.get(`/api/v1/users/${id}`).then(r => setUser(r.data)).catch(() => {});
+    if (id) api.get(`/api/users/${id}`).then(r => setUser(r.data)).catch(() => {});
   }, [id]);
 
   if (!user) return <div className="py-8 text-center text-cyber-muted">Loading...</div>;

@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, Component, type ReactNode } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -24,40 +24,61 @@ const CampaignManagement = lazy(() => import('./features/admin/CampaignManagemen
 const OrgSettings = lazy(() => import('./features/admin/OrgSettings'));
 const AdminLayout = lazy(() => import('./features/admin/AdminLayout'));
 
+class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-cyber-bg p-8">
+          <div className="max-w-lg rounded-xl border border-cyber-danger bg-cyber-card p-6">
+            <h1 className="text-xl font-bold text-cyber-danger">Something went wrong</h1>
+            <pre className="mt-4 overflow-auto text-sm text-cyber-muted whitespace-pre-wrap">{this.state.error.message}{'\n'}{this.state.error.stack}</pre>
+            <button onClick={() => window.location.reload()} className="mt-4 rounded bg-cyber-primary px-4 py-2 text-sm text-black">Reload</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const fallback = <LoadingSpinner />;
 
 export default function App() {
   return (
-    <Suspense fallback={fallback}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/auth/callback" element={<SSOCallback />} />
+    <ErrorBoundary>
+      <Suspense fallback={fallback}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth/callback" element={<SSOCallback />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<Layout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/rooms/:id" element={<GameCanvas />} />
-            <Route path="/rooms/:id/results" element={<ResultsScreen />} />
-            <Route path="/team/lobby/:id" element={<TeamLobby />} />
-            <Route path="/achievements" element={<AchievementsPage />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<Layout />}>
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/rooms/:id" element={<GameCanvas />} />
+              <Route path="/rooms/:id/results" element={<ResultsScreen />} />
+              <Route path="/team/lobby/:id" element={<TeamLobby />} />
+              <Route path="/achievements" element={<AchievementsPage />} />
+              <Route path="/leaderboard" element={<LeaderboardPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
 
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="users/:id" element={<UserDetail />} />
-              <Route path="groups" element={<GroupManagement />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-              <Route path="campaigns" element={<CampaignManagement />} />
-              <Route path="settings" element={<OrgSettings />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="users" element={<UserManagement />} />
+                <Route path="users/:id" element={<UserDetail />} />
+                <Route path="groups" element={<GroupManagement />} />
+                <Route path="analytics" element={<AnalyticsPage />} />
+                <Route path="reports" element={<ReportsPage />} />
+                <Route path="campaigns" element={<CampaignManagement />} />
+                <Route path="settings" element={<OrgSettings />} />
+              </Route>
             </Route>
           </Route>
-        </Route>
-      </Routes>
-    </Suspense>
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }

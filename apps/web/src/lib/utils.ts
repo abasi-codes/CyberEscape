@@ -11,8 +11,8 @@ export function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export function formatPoints(points: number): string {
-  return points.toLocaleString();
+export function formatPoints(points: number | undefined | null): string {
+  return (points ?? 0).toLocaleString();
 }
 
 export function calculateLevel(xp: number): number {

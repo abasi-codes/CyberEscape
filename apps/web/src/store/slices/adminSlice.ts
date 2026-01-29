@@ -37,20 +37,20 @@ const initialState: AdminState = {
 };
 
 export const fetchOrgStats = createAsyncThunk('admin/fetchOrgStats', async () => {
-  const res = await api.get('/api/v1/admin/stats/overview');
+  const res = await api.get('/api/admin/stats/overview');
   return res.data;
 });
 
 export const fetchUsers = createAsyncThunk(
   'admin/fetchUsers',
   async (params: { page?: number; search?: string }) => {
-    const res = await api.get('/api/v1/users', { params });
+    const res = await api.get('/api/users', { params });
     return res.data;
   },
 );
 
 export const fetchAlerts = createAsyncThunk('admin/fetchAlerts', async () => {
-  const res = await api.get('/api/v1/admin/alerts');
+  const res = await api.get('/api/admin/alerts');
   return res.data;
 });
 

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Lock, CheckCircle, Play, Flame, Star, Trophy } from 'lucide-react';
 import { api } from '@/lib/api';
-import { formatPoints } from '@/lib/utils';
+import { formatPoints, calculateLevel } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
 interface RoomStatus {
@@ -27,8 +27,21 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ totalPoints: 0, currentLevel: 1, currentStreak: 0, roomsCompleted: 0 });
 
   useEffect(() => {
-    api.get('/api/v1/rooms').then(r => setRooms(r.data)).catch(() => {});
-    api.get('/api/v1/gamification/progress').then(r => setStats(r.data)).catch(() => {});
+    api.get('/api/rooms').then(r => {
+      const data = Array.isArray(r.data) ? r.data : [];
+      setRooms(data.map((room: any) => ({
+        id: room.id,
+        number: room.order,
+        name: room.name,
+        description: room.description,
+        type: room.type,
+        status: 'NOT_STARTED' as const,
+      })));
+    }).catch(() => {});
+    api.get('/api/gamification/progress').then(r => {
+      const s = r.data?.stats || {};
+      setStats({ totalPoints: s.totalScore ?? 0, currentLevel: calculateLevel(s.totalScore ?? 0), currentStreak: s.currentStreak ?? 0, roomsCompleted: s.roomsCompleted ?? 0 });
+    }).catch(() => {});
   }, []);
 
   const statusIcon = (status: string) => {

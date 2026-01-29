@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type GamePhase = 'IDLE' | 'LOADING' | 'INTRO' | 'PUZZLE_ACTIVE' | 'PUZZLE_FEEDBACK' | 'ROOM_COMPLETE' | 'ROOM_FAILED' | 'DEBRIEF';
+type GamePhase = 'IDLE' | 'LOADING' | 'BRIEFING' | 'INTRO' | 'PUZZLE_ACTIVE' | 'PUZZLE_FEEDBACK' | 'ROOM_COMPLETE' | 'ROOM_FAILED' | 'DEBRIEF';
 
 interface PuzzleState {
   id: string;
@@ -14,6 +14,7 @@ interface PuzzleState {
 interface GameState {
   roomId: string | null;
   roomName: string;
+  roomType: string;
   phase: GamePhase;
   currentPuzzle: PuzzleState | null;
   currentPuzzleIndex: number;
@@ -27,6 +28,8 @@ interface GameState {
   completedPuzzleIds: string[];
   feedbackMessage: string;
   feedbackCorrect: boolean;
+  currentStreak: number;
+  bestStreak: number;
   lastScoreBreakdown: {
     basePoints: number;
     timeBonus: number;
@@ -40,6 +43,7 @@ interface GameState {
 const initialState: GameState = {
   roomId: null,
   roomName: '',
+  roomType: 'default',
   phase: 'IDLE',
   currentPuzzle: null,
   currentPuzzleIndex: 0,
@@ -53,6 +57,8 @@ const initialState: GameState = {
   completedPuzzleIds: [],
   feedbackMessage: '',
   feedbackCorrect: false,
+  currentStreak: 0,
+  bestStreak: 0,
   lastScoreBreakdown: null,
 };
 
@@ -60,9 +66,10 @@ const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    startRoom(state, action: PayloadAction<{ roomId: string; roomName: string; timeLimit: number; totalPuzzles: number }>) {
+    startRoom(state, action: PayloadAction<{ roomId: string; roomName: string; roomType?: string; timeLimit: number; totalPuzzles: number }>) {
       state.roomId = action.payload.roomId;
       state.roomName = action.payload.roomName;
+      state.roomType = action.payload.roomType || 'default';
       state.timeLimit = action.payload.timeLimit;
       state.timeRemaining = action.payload.timeLimit;
       state.totalPuzzles = action.payload.totalPuzzles;
@@ -72,7 +79,10 @@ const gameSlice = createSlice({
       state.hintsRevealed = [];
       state.completedPuzzleIds = [];
       state.currentPuzzleIndex = 0;
+      state.currentStreak = 0;
+      state.bestStreak = 0;
     },
+    setBriefing(state) { state.phase = 'BRIEFING'; },
     setIntro(state) { state.phase = 'INTRO'; },
     startPuzzle(state, action: PayloadAction<PuzzleState>) {
       state.currentPuzzle = action.payload;
@@ -86,8 +96,16 @@ const gameSlice = createSlice({
       state.feedbackCorrect = action.payload.correct;
       state.feedbackMessage = action.payload.message;
       state.lastScoreBreakdown = action.payload.scoreBreakdown;
-      if (action.payload.correct && action.payload.scoreBreakdown) {
-        state.score += action.payload.scoreBreakdown.totalPoints;
+      if (action.payload.correct) {
+        state.currentStreak += 1;
+        if (state.currentStreak > state.bestStreak) {
+          state.bestStreak = state.currentStreak;
+        }
+        if (action.payload.scoreBreakdown) {
+          state.score += action.payload.scoreBreakdown.totalPoints;
+        }
+      } else {
+        state.currentStreak = 0;
       }
     },
     completePuzzle(state) {
@@ -117,7 +135,7 @@ const gameSlice = createSlice({
 });
 
 export const {
-  startRoom, setIntro, startPuzzle, submitAnswer, showFeedback,
+  startRoom, setBriefing, setIntro, startPuzzle, submitAnswer, showFeedback,
   completePuzzle, revealHint, tickTimer, failRoom, completeRoom,
   goToDebrief, resetGame,
 } = gameSlice.actions;

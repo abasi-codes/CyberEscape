@@ -6,6 +6,7 @@ import gamificationReducer from './slices/gamificationSlice';
 import adminReducer from './slices/adminSlice';
 import chatReducer from './slices/chatSlice';
 import uiReducer from './slices/uiSlice';
+import settingsReducer from './slices/settingsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     admin: adminReducer,
     chat: chatReducer,
     ui: uiReducer,
+    settings: settingsReducer,
   },
 });
 

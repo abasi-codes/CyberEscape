@@ -11,13 +11,13 @@ export default function OrgSettings() {
   const [tab, setTab] = useState('general');
 
   useEffect(() => {
-    api.get('/api/v1/organizations/settings').then(r => setSettings(r.data)).catch(() => {});
+    api.get('/api/organizations/settings').then(r => setSettings(r.data)).catch(() => {});
   }, []);
 
   const save = async () => {
     setSaving(true);
     try {
-      await api.put('/api/v1/organizations/settings', settings);
+      await api.put('/api/organizations/settings', settings);
     } finally {
       setSaving(false);
     }

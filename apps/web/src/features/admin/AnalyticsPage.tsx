@@ -11,7 +11,7 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<any>({});
 
   useEffect(() => {
-    api.get(`/api/v1/admin/stats/${tab}`).then(r => setData(r.data)).catch(() => {});
+    api.get(`/api/admin/stats/${tab}`).then(r => setData(r.data)).catch(() => {});
   }, [tab]);
 
   const roomData = data.byRoom || [

@@ -19,7 +19,7 @@ export default function ProfilePage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.patch('/api/v1/users/me', { name, preferences: { leaderboardOptOut } });
+      await api.patch('/api/users/me', { name, preferences: { leaderboardOptOut } });
     } finally {
       setSaving(false);
     }

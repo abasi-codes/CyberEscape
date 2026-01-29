@@ -26,7 +26,7 @@ export async function buildApp() {
   await app.register(rateLimit, { max: 100, timeWindow: "1 minute" });
   await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 
-  app.get("/api/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
+  app.get("/api/v1/health", async () => ({ status: "ok", timestamp: new Date().toISOString() }));
 
   await app.register(authRoutes);
   await app.register(userRoutes);

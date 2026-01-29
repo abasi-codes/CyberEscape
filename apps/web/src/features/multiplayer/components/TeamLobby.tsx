@@ -23,7 +23,7 @@ export default function TeamLobby() {
 
   useEffect(() => {
     if (id) {
-      api.get(`/api/v1/teams/${id}`).then(r => {
+      api.get(`/api/teams/${id}`).then(r => {
         dispatch(setTeam({ teamId: r.data.id, name: r.data.name, joinCode: r.data.joinCode, roomId: r.data.roomId }));
       }).catch(() => {});
       emit('team:join', { teamId: id });

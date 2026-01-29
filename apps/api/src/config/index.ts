@@ -1,5 +1,5 @@
 export const config = {
-  port: parseInt(process.env.PORT || "3001", 10),
+  port: parseInt(process.env.API_PORT || process.env.PORT || "3003", 10),
   host: process.env.HOST || "0.0.0.0",
   nodeEnv: process.env.NODE_ENV || "development",
   jwt: {
@@ -16,7 +16,7 @@ export const config = {
     password: process.env.REDIS_PASSWORD || undefined,
   },
   cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   },
   google: {
     clientId: process.env.GOOGLE_CLIENT_ID || "",

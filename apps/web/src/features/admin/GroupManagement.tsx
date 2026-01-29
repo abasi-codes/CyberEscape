@@ -19,19 +19,19 @@ export default function GroupManagement() {
   const [newName, setNewName] = useState('');
 
   useEffect(() => {
-    api.get('/api/v1/groups').then(r => setGroups(r.data)).catch(() => {});
+    api.get('/api/groups').then(r => setGroups(r.data)).catch(() => {});
   }, []);
 
   const createGroup = async () => {
     if (!newName.trim()) return;
-    await api.post('/api/v1/groups', { name: newName });
+    await api.post('/api/groups', { name: newName });
     setNewName('');
     setShowCreate(false);
-    api.get('/api/v1/groups').then(r => setGroups(r.data));
+    api.get('/api/groups').then(r => setGroups(r.data));
   };
 
   const deleteGroup = async (id: string) => {
-    await api.delete(`/api/v1/groups/${id}`);
+    await api.delete(`/api/groups/${id}`);
     setGroups(prev => prev.filter(g => g.id !== id));
   };
 

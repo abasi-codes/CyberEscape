@@ -14,7 +14,7 @@ export default function CampaignManagement() {
   const [form, setForm] = useState({ name: '', startDate: '', dueDate: '' });
 
   useEffect(() => {
-    api.get('/api/v1/admin/campaigns').then(r => setCampaigns(r.data)).catch(() => {});
+    api.get('/api/admin/campaigns').then(r => setCampaigns(r.data)).catch(() => {});
   }, []);
 
   const statusColor = (s: string) => {
@@ -22,13 +22,13 @@ export default function CampaignManagement() {
   };
 
   const create = async () => {
-    await api.post('/api/v1/admin/campaigns', {
+    await api.post('/api/admin/campaigns', {
       ...form,
       targetGroups: [],
       settings: { requiredRooms: [1, 2, 3], reminderDays: [7, 3, 1], allowLateCompletion: false },
     });
     setShowCreate(false);
-    api.get('/api/v1/admin/campaigns').then(r => setCampaigns(r.data));
+    api.get('/api/admin/campaigns').then(r => setCampaigns(r.data));
   };
 
   return (

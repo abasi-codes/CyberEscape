@@ -7,7 +7,7 @@ interface Props {
   onRequestHint: () => void;
 }
 
-export default function HintPanel({ hints, revealedHints, onRequestHint }: Props) {
+export default function HintPanel({ hints = [], revealedHints = [], onRequestHint }: Props) {
   const nextHintIndex = revealedHints.length;
   const hasMore = nextHintIndex < hints.length;
   const nextCost = hasMore ? hints[nextHintIndex].cost : 0;

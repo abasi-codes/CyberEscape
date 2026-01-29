@@ -14,15 +14,28 @@ export class AuthService {
     const existing = await prisma.user.findUnique({ where: { email: input.email } });
     if (existing) throw conflict("Email already registered");
 
+    let organizationId = input.organizationId;
+    if (!organizationId) {
+      let defaultOrg = await prisma.organization.findFirst();
+      if (!defaultOrg) {
+        defaultOrg = await prisma.organization.create({ data: { name: "Default Organization", slug: "default" } });
+      }
+      organizationId = defaultOrg.id;
+    }
+
+    const nameParts = input.name.trim().split(/\s+/);
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "";
+
     const passwordHash = await bcrypt.hash(input.password, 12);
     const user = await prisma.user.create({
       data: {
         email: input.email,
         passwordHash,
-        firstName: input.firstName,
-        lastName: input.lastName,
+        firstName,
+        lastName,
         role: input.role as any,
-        organizationId: input.organizationId,
+        organizationId,
         stats: { create: {} },
       },
       select: { id: true, email: true, firstName: true, lastName: true, role: true, organizationId: true },
@@ -32,7 +45,7 @@ export class AuthService {
       userId: user.id, email: user.email, role: user.role, organizationId: user.organizationId,
     });
 
-    return { user, ...tokens };
+    return { user: { id: user.id, email: user.email, name: `${user.firstName} ${user.lastName}`.trim(), role: user.role, orgId: user.organizationId }, ...tokens };
   }
 
   async login(input: LoginInput) {
@@ -50,7 +63,7 @@ export class AuthService {
     });
 
     return {
-      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role, organizationId: user.organizationId },
+      user: { id: user.id, email: user.email, name: `${user.firstName} ${user.lastName}`.trim(), role: user.role, orgId: user.organizationId },
       ...tokens,
     };
   }

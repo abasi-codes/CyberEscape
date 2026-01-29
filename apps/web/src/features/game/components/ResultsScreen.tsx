@@ -23,7 +23,7 @@ export default function ResultsScreen() {
   const [results, setResults] = useState<Results | null>(null);
 
   useEffect(() => {
-    if (id) api.get(`/api/v1/rooms/${id}/results`).then(r => setResults(r.data)).catch(() => {});
+    if (id) api.get(`/api/rooms/${id}/results`).then(r => setResults(r.data)).catch(() => {});
   }, [id]);
 
   if (!results) return <div className="py-20 text-center text-cyber-muted">Loading results...</div>;

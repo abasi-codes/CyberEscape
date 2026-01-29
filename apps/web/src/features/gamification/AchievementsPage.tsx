@@ -23,7 +23,7 @@ export default function AchievementsPage() {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    api.get('/api/v1/gamification/badges').then(r => setBadges(r.data)).catch(() => {});
+    api.get('/api/gamification/badges').then(r => setBadges(r.data)).catch(() => {});
   }, []);
 
   const categories = ['all', ...new Set(badges.map(b => b.category))];
