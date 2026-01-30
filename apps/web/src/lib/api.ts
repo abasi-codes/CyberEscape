@@ -25,6 +25,14 @@ async function request<T = any>(method: string, path: string, body?: any, config
   });
 
   if (res.status === 401) {
+    const isGuestToken = token?.startsWith('guest-demo-token-');
+
+    // For guest tokens, just throw - don't try to refresh or redirect
+    // This lets .catch() handlers in components use fallback data
+    if (isGuestToken) {
+      throw { response: { data: { message: 'Guest mode - API unavailable' } } };
+    }
+
     const refreshToken = localStorage.getItem('refreshToken');
     if (refreshToken) {
       const refreshRes = await fetch('/api/auth/refresh', {
